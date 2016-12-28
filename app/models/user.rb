@@ -1,6 +1,16 @@
 class User < ApplicationRecord
   has_many :microposts, dependent: :destroy
+  # 用户是别人的 follower
+  has_many :active_relationships, class_name: "Relationship", foreign_key: "follower_id", dependent: :destroy
+  # 用户被别人 followed
+  has_many :passive_relationships, class_name: "Relationship", foreign_key: "followed_id", dependent: :destroy
+  # 积极关系：有很多正在关注的人 那些人被用户关注
+  has_many :following, through: :active_relationships, source: :followed
+  # 消极关系：用户被很多人关注 那些人在关注用户
+  has_many :followers, through: :passive_relationships, source: :follower
+
   attr_accessor :remember_token, :activation_token, :reset_token
+
   before_save :downcase_email
   before_create :create_activation_digest
   # before_save { email.downcase! }
@@ -69,7 +79,23 @@ class User < ApplicationRecord
   # 实现动态流
   # 完整的实现看第 14 章
   def feed
-    Micropost.where("user_id = ?", id)
+    following_ids = "SELECT followed_id FROM relationships WHERE follower_id = :user_id"
+    Micropost.where("user_id IN (#{following_ids}) OR user_id = :user_id", user_id: id)
+  end
+
+  # 关注另一个用户
+  def follow(other_user)
+    active_relationships.create(followed_id: other_user.id)
+  end
+
+  # 取消关注另一个用户
+  def unfollow(other_user)
+    active_relationships.find_by(followed_id: other_user.id).destroy
+  end
+
+  # 如果当前用户关注了指定的用户，返回true
+  def following?(other_user)
+    following.include?(other_user)
   end
 
   private
