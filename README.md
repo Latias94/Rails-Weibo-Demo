@@ -1,24 +1,10 @@
-# README
+# Rails-Weibo-Demo
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## 环境
+Ruby: 2.3.0
+Rails: 5.0.0.1
 
-Things you may want to cover:
+## 简介
+Ruby on rails 实现的类微博示例，实现用户验证系统（发送注册邮件，修改密码邮件等）、不对称关注、微博信息流。
 
-* Ruby version
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
